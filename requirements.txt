@@ -1,0 +1,6 @@
+# Runtime: Qt GUI (the "Essentials" wheel is the core of PySide6 without the
+# large add-on modules, which keeps the .exe much smaller).
+PySide6-Essentials>=6.5,<7
+
+# Build only
+pyinstaller>=6.3
