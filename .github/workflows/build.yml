@@ -1,4 +1,4 @@
-name: Build Windows EXE
+name: Build BleeClicker.exe
 
 on:
   push:
@@ -23,19 +23,19 @@ jobs:
       - name: Run tests
         run: python -m pytest -v tests
 
-      - name: Build AutoClicker.exe
-        run: pyinstaller --clean --noconfirm AutoClicker.spec
+      - name: Build BleeClicker.exe
+        run: pyinstaller --clean --noconfirm BleeClicker.spec
 
       - name: Smoke-test the exe starts
         shell: pwsh
         run: |
-          $p = Start-Process -FilePath dist\AutoClicker.exe -PassThru
+          $p = Start-Process -FilePath dist\BleeClicker.exe -PassThru
           Start-Sleep -Seconds 8
-          if ($p.HasExited) { throw "AutoClicker.exe exited early with code $($p.ExitCode)" }
+          if ($p.HasExited) { throw "BleeClicker.exe exited early with code $($p.ExitCode)" }
           Stop-Process -Id $p.Id -Force
-          Get-Item dist\AutoClicker.exe | Select-Object Name, Length
+          Get-Item dist\BleeClicker.exe | Select-Object Name, Length
 
       - uses: actions/upload-artifact@v4
         with:
-          name: AutoClicker
-          path: dist/AutoClicker.exe
+          name: BleeClicker
+          path: dist/BleeClicker.exe

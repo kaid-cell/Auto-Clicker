@@ -52,7 +52,7 @@ def main() -> int:
         return 0
 
     settings = Settings.load(SETTINGS_FILE)
-    theme.apply_theme(app, settings.theme)
+    theme.apply_theme(app, settings.theme, settings.accent)
     window = MainWindow(settings, icon)
     window.show()
     try:

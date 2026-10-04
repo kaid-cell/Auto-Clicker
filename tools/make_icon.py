@@ -5,28 +5,48 @@ The generated icon is committed, so this is only needed to change the artwork.
 
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
-SIZE = 256
+SIZE = 1024  # drawn large, then downsampled for smooth edges
 OUT = Path(__file__).resolve().parent.parent / "assets" / "icon.ico"
+VIOLET, CYAN = (124, 92, 255), (0, 212, 255)
 
 
-def draw(size: int = SIZE) -> Image.Image:
-    s = size / 256
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+def gradient(size: int) -> Image.Image:
+    """Diagonal violet -> cyan gradient."""
+    g = Image.new("RGB", (size, size))
+    px = g.load()
+    for y in range(size):
+        for x in range(size):
+            t = (x + y) / (2 * size - 2)
+            px[x, y] = tuple(round(a + (b - a) * t) for a, b in zip(VIOLET, CYAN))
+    return g
+
+
+def draw() -> Image.Image:
+    s = SIZE / 256
+    small = gradient(128).resize((SIZE, SIZE), Image.BICUBIC)
+    mask = Image.new("L", (SIZE, SIZE), 0)
+    ImageDraw.Draw(mask).rounded_rectangle((8 * s, 8 * s, 248 * s, 248 * s), radius=60 * s, fill=255)
+    img = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    img.paste(small, (0, 0), mask)
+
     d = ImageDraw.Draw(img)
-    # Rounded blue tile
-    d.rounded_rectangle((8 * s, 8 * s, 248 * s, 248 * s), radius=52 * s, fill=(0, 103, 192, 255))
-    # Click "ripples"
-    cx, cy = 104 * s, 100 * s
-    for r, w in ((70, 10), (44, 10)):
-        d.arc((cx - r * s, cy - r * s, cx + r * s, cy + r * s), 200, 340,
-              fill=(255, 255, 255, 150), width=max(1, int(w * s)))
-    # Mouse pointer arrow
-    arrow = [(104, 100), (104, 214), (132, 186), (152, 232), (174, 222), (154, 177), (194, 177)]
-    d.polygon([(x * s, y * s) for x, y in arrow], fill=(255, 255, 255, 255),
-              outline=(20, 40, 70, 255), width=max(1, int(6 * s)))
-    return img
+    # Click ripples around the pointer tip
+    cx, cy = 96 * s, 92 * s
+    for r, a in ((62, 120), (40, 190)):
+        d.arc((cx - r * s, cy - r * s, cx + r * s, cy + r * s), 195, 345,
+              fill=(255, 255, 255, a), width=int(11 * s))
+    # Pointer with soft shadow
+    arrow = [(96, 92), (96, 210), (125, 182), (146, 228), (170, 217), (149, 172), (190, 172)]
+    pts = [(x * s, y * s) for x, y in arrow]
+    shadow = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    ImageDraw.Draw(shadow).polygon([(x + 6 * s, y + 8 * s) for x, y in pts], fill=(20, 10, 60, 120))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(8 * s))
+    shadow.putalpha(ImageChops.multiply(shadow.getchannel("A"), mask))
+    img = Image.alpha_composite(img, shadow)
+    ImageDraw.Draw(img).polygon(pts, fill=(255, 255, 255, 255))
+    return img.resize((256, 256), Image.LANCZOS)
 
 
 if __name__ == "__main__":

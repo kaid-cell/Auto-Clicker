@@ -1,8 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller spec for a single-file, windowed AutoClicker.exe
+# PyInstaller spec for a single-file, windowed BleeClicker.exe
 #
-# Build with:   pyinstaller --clean --noconfirm AutoClicker.spec
-# Output:       dist/AutoClicker.exe
+# Build with:   pyinstaller --clean --noconfirm BleeClicker.spec
+# Output:       dist/BleeClicker.exe
 
 block_cipher = None
 
@@ -12,7 +12,7 @@ EXCLUDES = [
     "PySide6.QtNetwork", "PySide6.QtQml", "PySide6.QtQuick", "PySide6.QtQuickWidgets",
     "PySide6.QtSql", "PySide6.QtTest", "PySide6.QtXml", "PySide6.QtOpenGL",
     "PySide6.QtOpenGLWidgets", "PySide6.QtPrintSupport", "PySide6.QtDBus",
-    "PySide6.QtConcurrent", "PySide6.QtSvg", "PySide6.QtSvgWidgets",
+    "PySide6.QtConcurrent", "PySide6.QtSvgWidgets",   # (QtSvg itself is used for icons)
     "PySide6.QtMultimedia", "PySide6.QtWebEngineCore", "PySide6.QtWebEngineWidgets",
     "PySide6.Qt3DCore", "PySide6.QtCharts", "PySide6.QtDataVisualization",
     "PySide6.QtPdf", "PySide6.QtPdfWidgets", "PySide6.QtDesigner", "PySide6.QtHelp",
@@ -40,7 +40,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name="AutoClicker",
+    name="BleeClicker",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
